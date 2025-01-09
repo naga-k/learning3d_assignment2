@@ -9,6 +9,9 @@ from pytorch3d.ops import sample_points_from_meshes
 from pytorch3d.structures import Meshes
 import dataset_location
 import torch
+from utils_assignment_1 import render_voxels
+from PIL import Image
+from PIL import ImageDraw, ImageFont
 
 
 
@@ -123,12 +126,53 @@ def train_model(args):
 
     if args.type == "vox":
         # initialization
-        voxels_src = torch.rand(feed_cuda['voxels'].shape,requires_grad=True, device=args.device)
+        voxels_src = torch.rand(feed_cuda['voxels'].shape, requires_grad=True, device=args.device)
         voxel_coords = feed_cuda['voxel_coords'].unsqueeze(0)
         voxels_tgt = feed_cuda['voxels']
 
         # fitting
         fit_voxel(voxels_src, voxels_tgt, args)
+
+        # receive 2 PIL images
+        image_voxels_source = render_voxels(voxels=voxels_src)
+        image_voxels_tgt = render_voxels(voxels=voxels_tgt)
+
+        # save these two side by side in the same image
+
+        # Convert tensors to PIL images if necessary
+
+        # Create a new image with width = sum of widths and height = max of heights
+        total_width = image_voxels_source.width + image_voxels_tgt.width
+        max_height = max(image_voxels_source.height, image_voxels_tgt.height)
+        new_image = Image.new('RGB', (total_width, max_height))
+
+        # Paste the images side by side
+        new_image.paste(image_voxels_source, (0, 0))
+        new_image.paste(image_voxels_tgt, (image_voxels_source.width, 0))
+
+        # Save the new image
+        # Create the output directory if it does not exist
+        output_dir = './outputs'
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        # Add text to the image
+
+        # draw = ImageDraw.Draw(new_image)
+        # text = "Result for Q1.1: Binary Cross Entropy Loss Optimized Grid"
+        # font = ImageFont.load_default()
+        # text_width, text_height = draw.textsize(text, font=font)
+        # text_x = (total_width - text_width) // 2
+        # text_y = max_height - text_height - 10
+        # draw.text((text_x, text_y), text, font=font, fill="white")
+
+        # Save the new image
+        new_image.save(f'./{output_dir}/voxels_comparison_1.1.png')
+
+
+
+
+
+        
 
 
     elif args.type == "point":

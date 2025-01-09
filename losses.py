@@ -6,6 +6,8 @@ def voxel_loss(voxel_src,voxel_tgt):
 	# voxel_tgt: b x h x w x d
 	# loss = 
 	# implement some loss for binary voxel grids
+	voxel_src = torch.sigmoid(voxel_src)
+	loss = torch.nn.functional.binary_cross_entropy(voxel_src, voxel_tgt)
 	return loss
 
 def chamfer_loss(point_cloud_src,point_cloud_tgt):

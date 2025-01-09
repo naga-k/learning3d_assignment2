@@ -1,0 +1,16 @@
+r2n2_shapenet_dataset/
+r2n2_shapenet_dataset_full/
+r2n2_shapenet_dataset.zip
+r2n2_shapenet_dataset_full.zip
+
+# Common Python patterns
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+.venv
+env/
+venv/
+ENV/
+.DS_Store
