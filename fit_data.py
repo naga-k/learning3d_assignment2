@@ -9,9 +9,9 @@ from pytorch3d.ops import sample_points_from_meshes
 from pytorch3d.structures import Meshes
 import dataset_location
 import torch
-from utils_assignment_1 import render_voxels
+from utils import combine_images_horizontal
+from utils_assignment_1 import render_points, render_voxels
 from PIL import Image
-from PIL import ImageDraw, ImageFont
 
 
 
@@ -21,7 +21,7 @@ from PIL import ImageDraw, ImageFont
 def get_args_parser():
     parser = argparse.ArgumentParser('Model Fit', add_help=False)
     parser.add_argument('--lr', default=4e-4, type=float)
-    parser.add_argument('--max_iter', default=100000, type=int)
+    parser.add_argument('--max_iter', default=10000, type=int)
     parser.add_argument('--type', default='vox', choices=['vox', 'point', 'mesh'], type=str)
     parser.add_argument('--n_points', default=5000, type=int)
     parser.add_argument('--w_chamfer', default=1.0, type=float)
@@ -137,42 +137,7 @@ def train_model(args):
         image_voxels_source = render_voxels(voxels=voxels_src)
         image_voxels_tgt = render_voxels(voxels=voxels_tgt)
 
-        # save these two side by side in the same image
-
-        # Convert tensors to PIL images if necessary
-
-        # Create a new image with width = sum of widths and height = max of heights
-        total_width = image_voxels_source.width + image_voxels_tgt.width
-        max_height = max(image_voxels_source.height, image_voxels_tgt.height)
-        new_image = Image.new('RGB', (total_width, max_height))
-
-        # Paste the images side by side
-        new_image.paste(image_voxels_source, (0, 0))
-        new_image.paste(image_voxels_tgt, (image_voxels_source.width, 0))
-
-        # Save the new image
-        # Create the output directory if it does not exist
-        output_dir = './outputs'
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        # Add text to the image
-
-        # draw = ImageDraw.Draw(new_image)
-        # text = "Result for Q1.1: Binary Cross Entropy Loss Optimized Grid"
-        # font = ImageFont.load_default()
-        # text_width, text_height = draw.textsize(text, font=font)
-        # text_x = (total_width - text_width) // 2
-        # text_y = max_height - text_height - 10
-        # draw.text((text_x, text_y), text, font=font, fill="white")
-
-        # Save the new image
-        new_image.save(f'./{output_dir}/voxels_comparison_1.1.png')
-
-
-
-
-
-        
+        combine_images_horizontal(image_voxels_source, image_voxels_tgt, 'voxels_comparison_1.1.png') 
 
 
     elif args.type == "point":
@@ -182,7 +147,14 @@ def train_model(args):
         pointclouds_tgt = sample_points_from_meshes(mesh_tgt, args.n_points)
 
         # fitting
-        fit_pointcloud(pointclouds_src, pointclouds_tgt, args)        
+        fit_pointcloud(pointclouds_src, pointclouds_tgt, args)    
+
+        image_points_src = render_points(points=pointclouds_src )    
+        image_points_tgt = render_points(points=pointclouds_tgt)
+
+        combine_images_horizontal(image_points_src, image_points_tgt, 'points_comparison_1.2.png')
+
+        
     
     elif args.type == "mesh":
         # initialization
