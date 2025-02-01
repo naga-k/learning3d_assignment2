@@ -1,3 +1,4 @@
+import pytorch3d.loss
 import torch
 import pytorch3d
 
@@ -8,8 +9,11 @@ def voxel_loss(voxel_src,voxel_tgt):
 	# voxel_tgt: b x h x w x d
 	# loss = 
 	# implement some loss for binary voxel grids
-	voxel_src = torch.sigmoid(voxel_src)
-	loss = torch.nn.functional.binary_cross_entropy(voxel_src, voxel_tgt)
+	loss = torch.nn.functional.binary_cross_entropy_with_logits(
+        voxel_src,
+        voxel_tgt,
+        reduction='mean'
+    )
 	return loss
 
 def chamfer_loss(point_cloud_src, point_cloud_tgt):
@@ -38,4 +42,4 @@ def chamfer_loss(point_cloud_src, point_cloud_tgt):
 def smoothness_loss(mesh_src):
 	# loss_laplacian = 
 	# implement laplacian smoothening loss
-	return loss_laplacian
+    return pytorch3d.loss.mesh_laplacian_smoothing(mesh_src)

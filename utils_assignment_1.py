@@ -109,7 +109,7 @@ def render_voxels(
     return image
 
 def render_points(
-        points = None,
+        points,
         image_size=256,
         background_color=(1, 1, 1),
 ):
@@ -144,3 +144,31 @@ def render_points(
     # image.save(output_file)
 
     return image
+
+
+def render_mesh(
+        mesh,
+        image_size=256,
+        background_colour=(1,1,1)
+
+):
+    device = mesh.device
+    if not mesh.textures:
+        verts_rgb = torch.ones_like(mesh.verts_padded())[..., :3]  # (1, V, 3)
+        mesh.textures = pytorch3d.renderer.TexturesVertex(verts_features=verts_rgb)
+
+    lights = pytorch3d.renderer.PointLights(location=[[0, 0.0, -4.0]], device=device,)
+    renderer = get_mesh_renderer(image_size=image_size, device=device)
+    R, T = pytorch3d.renderer.look_at_view_transform(dist=2, elev=0, azim=180)
+    cameras = pytorch3d.renderer.FoVPerspectiveCameras(R=R, T=T, device=device)
+    rendered_image = renderer(mesh, cameras=cameras, lights=lights)
+    # Convert to numpy and scale to 0-255
+    image_np = rendered_image[0, ..., :3].detach().cpu().numpy()
+    image_np = (image_np * 255).astype(np.uint8)
+
+    # Convert to PIL Image and save
+    image = Image.fromarray(image_np)
+    # image.save(output_file)
+
+    return image
+

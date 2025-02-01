@@ -10,7 +10,7 @@ from pytorch3d.structures import Meshes
 import dataset_location
 import torch
 from utils import combine_images_horizontal
-from utils_assignment_1 import render_points, render_voxels
+from utils_assignment_1 import render_mesh, render_points, render_voxels
 from PIL import Image
 
 
@@ -21,7 +21,7 @@ from PIL import Image
 def get_args_parser():
     parser = argparse.ArgumentParser('Model Fit', add_help=False)
     parser.add_argument('--lr', default=4e-4, type=float)
-    parser.add_argument('--max_iter', default=10000, type=int)
+    parser.add_argument('--max_iter', default=100000, type=int)
     parser.add_argument('--type', default='vox', choices=['vox', 'point', 'mesh'], type=str)
     parser.add_argument('--n_points', default=5000, type=int)
     parser.add_argument('--w_chamfer', default=1.0, type=float)
@@ -163,11 +163,12 @@ def train_model(args):
         mesh_tgt = Meshes(verts=[feed_cuda['verts']], faces=[feed_cuda['faces']])
 
         # fitting
-        fit_mesh(mesh_src, mesh_tgt, args)        
+        fit_mesh(mesh_src, mesh_tgt, args)   
 
+        image_mesh_src = render_mesh(mesh_src)
+        image_mesh_tgt = render_mesh(mesh_tgt)
 
-    
-    
+        combine_images_horizontal(image_mesh_src, image_mesh_tgt, 'mesh_comparison_1.3.png')
 
 
 if __name__ == '__main__':
