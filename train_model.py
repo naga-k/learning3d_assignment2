@@ -14,10 +14,10 @@ def get_args_parser():
     parser = argparse.ArgumentParser("Singleto3D", add_help=False)
     # Model parameters
     parser.add_argument("--arch", default="resnet18", type=str)
-    parser.add_argument("--lr", default=4e-4, type=float)
+    parser.add_argument("--lr", default=4e-3, type=float)
     parser.add_argument("--max_iter", default=100000, type=int)
     parser.add_argument("--batch_size", default=32, type=int)
-    parser.add_argument("--num_workers", default=4, type=int)
+    parser.add_argument("--num_workers", default=12, type=int)
     parser.add_argument(
         "--type", default="vox", choices=["vox", "point", "mesh"], type=str
     )
@@ -25,6 +25,7 @@ def get_args_parser():
     parser.add_argument("--w_chamfer", default=1.0, type=float)
     parser.add_argument("--w_smooth", default=0.1, type=float)
     parser.add_argument("--save_freq", default=2000, type=int)
+    parser.add_argument("--device", default="cuda:0" if torch.cuda.is_available() else "cpu", type=str)
     parser.add_argument("--load_checkpoint", action="store_true")
     parser.add_argument('--load_feat', action='store_true') 
     return parser
