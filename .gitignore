@@ -14,3 +14,9 @@ env/
 venv/
 ENV/
 .DS_Store
+
+#checkpoints
+/checkpoint_vox.pth
+
+#vscode
+.vscode/
